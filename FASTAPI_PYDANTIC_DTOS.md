@@ -128,3 +128,31 @@ If you want, I can:
 - Add `response_model` annotations to `main.py`.
 - Add example Postman collection or more examples.
 - Create a small README with run steps.
+
+---
+
+## Concept explanations
+
+- `enumerate(iterable)`:
+  - Returns pairs `(index, item)` while iterating. In `main.py` it's used in `update_product` to get the index of the matching item so the code can replace `products[index] = updated_dict` safely.
+  - Why use it: it lets you update a list in-place by index while iterating, which is simpler and less error-prone than searching again for an index.
+
+- `product_data.model_dump()` (Pydantic v2):
+  - Pydantic model instances are not plain dictionaries; `.model_dump()` converts the validated model into a serializable Python `dict`.
+  - Why use it: convert the model to a dict before appending to `products` or before sending it as JSON in responses.
+  - Note: in Pydantic v1 the equivalent was `.dict()`.
+
+- `request.query_params`:
+  - FastAPI exposes request-level query params via the `Request` object as an immutable `MultiDict`-like mapping.
+  - Converting to `dict(request.query_params)` yields a plain dict for easier access and logging.
+
+- Why use DTOs / Pydantic models:
+  - Validation: required fields and types are validated automatically; invalid requests return a 422 response.
+  - Parsing: incoming JSON is parsed into typed Python objects, reducing manual parsing code.
+  - Documentation: models automatically show in the OpenAPI schema and Swagger UI, improving API discoverability.
+
+- Other small notes:
+  - Use `enumerate` when you need an item's index during iteration; use simple `for item in list` when you only need the value.
+  - When updating or deleting items, prefer identifying items by a unique id and returning appropriate HTTP status codes (e.g., 201 for created, 404 for not found).
+  - When returning data to clients, consider `response_model` and `status_code` in the route decorator for clearer OpenAPI docs and stronger validation.
+
