@@ -91,15 +91,18 @@ def create_product(product_data: productDTO):
 # Return all products (alias of /products in this example)
 @app.get("/all_products")
 def get_all_products():
-    return products
+    return {
+        "status": "success",
+        "data": products,
+    }
 
 
 # Delete a product by id
 @app.delete("/delete_product/{product_id}")
 def delete_product(product_id: int):
-    for product in products:
+    for index, product in enumerate(products):
         if product.get("id") == product_id:
-            products.remove(product)
+            products.pop(index)
             return {"status": "product deleted successfully", "data": products}
     return {"error": "product not found for this id"}
 
